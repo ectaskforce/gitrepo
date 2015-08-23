@@ -16,6 +16,10 @@
  */
 package com.oonoyoshihito.spark.velocity;
 
+import com.oonoyoshihito.dbcp.DBCP;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,30 +36,30 @@ public final class VelocityMain implements SparkApplication {
 
     @Override
     public void init() {
+        String table = "";
+        HtmlTableHelper hth = new HtmlTableHelper();
+        try {
+            Connection con = DBCP.connect();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("select * from siharai order by id desc");
+            while(rs.next()) {
+                hth.putRec(rs);
+            }
+            rs.close();
+            st.close();
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String htmlTable = hth.makeTableInner();
         get("/hello", (request, response) -> {
             Map<String, Object> model = new HashMap<>();
-            model.put("hello", "Velocity World");
-            model.put("person", new Person("Foobar"));
+            model.put("table", htmlTable);
+            model.put("result", hth.core.size());
 
             // The wm files are located under the resources directory
             return new ModelAndView(model, "hello.wm");
         }, new VelocityTemplateEngine());
-    }
-
-    public static class Person {
-        private String name;
-
-        public Person(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
     }
 
 }

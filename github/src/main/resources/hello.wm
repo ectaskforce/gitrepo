@@ -9,9 +9,7 @@
  </style>
 </head>
 <body>
-    <div>
-    Hello ${hello}! <br/>
-    Hello ${person.Name}!
-    </div>
+${table}
+${result}
 </body>
 </html>
