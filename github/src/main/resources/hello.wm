@@ -9,6 +9,16 @@
  </style>
 </head>
 <body>
+    <h2> quick pay list </h2>
+    <form method="post" action="./hello">
+        data date : <input type="text" name="datadate" value="" size="10" />&nbsp;
+        price : <input type="text" name="price" value="" size="10" />&nbsp;
+        sime : <input type="text" name="sime" value="" size="10" />&nbsp;
+        type : <input type="text" name="type" value="" size="1" />&nbsp;
+        desc : <input type="text" name="desc" value="" size="100" />&nbsp;
+        <input type="submit" value="insert" />
+    </form>    
+<hr/>
 ${table}
 ${result}
 </body>

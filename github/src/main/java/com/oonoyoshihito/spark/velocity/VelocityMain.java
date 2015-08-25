@@ -16,8 +16,8 @@
  */
 package com.oonoyoshihito.spark.velocity;
 
-import com.oonoyoshihito.dbcp.DBCP;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -27,6 +27,7 @@ import spark.ModelAndView;
 import spark.template.velocity.VelocityTemplateEngine;
 
 import static spark.Spark.get;
+import static spark.Spark.post;
 import spark.servlet.SparkApplication;
 
 /**
@@ -36,12 +37,51 @@ public final class VelocityMain implements SparkApplication {
 
     @Override
     public void init() {
+
+        get("/hello", (request, response) -> {
+            HtmlTableHelper hth = getHtmlTable("select * from siharai order by id desc");
+            String htmlTable = getSiharaiSum() + "<br/>" + hth.makeTableInner();
+            Map<String, Object> model = new HashMap<>();
+            model.put("table", htmlTable);
+            model.put("result", hth.core.size());
+
+            // The wm files are located under the resources directory
+            return new ModelAndView(model, "hello.wm");
+        }, new VelocityTemplateEngine());
+        
+        post("/hello", (request, response) -> {
+            String ret = "";
+            try {
+            Connection con = Connector.connect(new JDBC());
+            String psql = " INSERT INTO siharai ( datadate, l_kamoku, r_kamoku, kin , shiharaidate, sumi, seikyu_kbn ,description ) values ";
+            psql += "(?, '5999', '2101', ?, ? , '0', ?, ?)";
+            PreparedStatement ps = con.prepareStatement(psql);
+            ps.setString(1, request.queryParams("datadate"));
+            ps.setString(2, request.queryParams("price"));
+            ps.setString(3, request.queryParams("sime"));
+            ps.setString(4, request.queryParams("type"));
+            ps.setString(5, request.queryParams("desc"));
+            ps.execute();
+            response.redirect("./hello"); 
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+            return ret;
+            });
+        
+    }
+
+    public String getSiharaiSum() {
+        return getHtmlTable("select * from v_total order by shiharaidate desc").makeTableInner();
+    }
+    
+    public HtmlTableHelper getHtmlTable(String sql) {
         String table = "";
         HtmlTableHelper hth = new HtmlTableHelper();
         try {
-            Connection con = DBCP.connect();
+            Connection con = Connector.connect(new JDBC());
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("select * from siharai order by id desc");
+            ResultSet rs = st.executeQuery(sql);
             while(rs.next()) {
                 hth.putRec(rs);
             }
@@ -51,15 +91,7 @@ public final class VelocityMain implements SparkApplication {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String htmlTable = hth.makeTableInner();
-        get("/hello", (request, response) -> {
-            Map<String, Object> model = new HashMap<>();
-            model.put("table", htmlTable);
-            model.put("result", hth.core.size());
-
-            // The wm files are located under the resources directory
-            return new ModelAndView(model, "hello.wm");
-        }, new VelocityTemplateEngine());
+        
+        return hth;
     }
-
 }

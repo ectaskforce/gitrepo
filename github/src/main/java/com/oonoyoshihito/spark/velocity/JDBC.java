@@ -13,15 +13,15 @@ import java.io.Serializable;
  */
 public class JDBC implements Serializable {
     
-    private String jdbcDrvier ;
+    private String jdbcDrvier = "com.mysql.jdbc.Driver" ;
     
-    private String url;
+    private String url = "jdbc:mysql://localhost/keiri";
     
-    private String user;
+    private String user = "root";
     
-    private String pass;
+    private String pass = "";
     
-    private String schema;
+    private String schema = "keiri";
     
     private String tableName;
 

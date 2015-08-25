@@ -6,7 +6,6 @@
 package com.oonoyoshihito.spark.velocity;
 
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 
 /**
