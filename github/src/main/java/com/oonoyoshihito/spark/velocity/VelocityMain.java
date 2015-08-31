@@ -51,7 +51,7 @@ public final class VelocityMain implements SparkApplication {
         }, new VelocityTemplateEngine());
         
         get("/zandaka", (request, response) -> {
-            HtmlTableHelper hth = getHtmlTable("SELECT z.*, ( z.mufj + z.gen + z.edy + z.jibun + z.floating ) total FROM tb_zandaka z INNER JOIN (SELECT MAX(id) maxid FROM tb_zandaka ) m ON z.id = m.maxid ");
+            HtmlTableHelper hth = getHtmlTable("SELECT z.*, ( z.mufj + z.gen + z.edy + z.jibun + z.floating ) total FROM tb_zandaka z INNER JOIN (SELECT MAX(id) maxid FROM tb_zandaka ) m ON z.id >= ( m.maxid - 30 )");
             String htmlTable =  hth.makeTableInner();
             Map<String, Object> model = new HashMap<>();
             LocalDate locald = LocalDate.now();
