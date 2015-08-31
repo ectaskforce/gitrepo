@@ -51,7 +51,7 @@ public final class VelocityMain implements SparkApplication {
         }, new VelocityTemplateEngine());
         
         get("/zandaka", (request, response) -> {
-            HtmlTableHelper hth = getHtmlTable("SELECT z.*, ( z.mufj + z.gen + z.edy + z.jibun + z.floating ) total FROM tb_zandaka order by id desc");
+            HtmlTableHelper hth = getHtmlTable("SELECT z.*, ( z.mufj + z.gen + z.edy + z.jibun + z.floating ) total FROM tb_zandaka z order by id desc");
             String htmlTable =  hth.makeTableInner();
             Map<String, Object> model = new HashMap<>();
             LocalDate locald = LocalDate.now();
