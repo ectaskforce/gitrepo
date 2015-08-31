@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="UTF-8">
+ <style>
+  * {
+    font-size : 11pt;
+ }
+ 
+ td.r2 {
+     background-color: #e0ffe0;
+     text-align: right;
+ }
+ 
+  td.r3 {
+     background-color: #ffffe0;
+     text-align: right;
+ }
+
+ </style>
+</head>
+<body>
+    <h2> Zandaka list </h2>
+    <form method="post" action="./zandaka">
+        data date : <input type="text" name="datadate" value="${datadate}" size="10" />&nbsp;
+        mufj : <input type="text" name="mufj" value="" size="10" />&nbsp;
+        jibun : <input type="text" name="jibun" value="" size="10" />&nbsp;
+        edy : <input type="text" name="edy" value="" size="10" />&nbsp;
+        gen : <input type="text" name="gen" value="" size="10" />&nbsp;
+        float : <input type="text" name="float" value="" size="10" />&nbsp;
+        <input type="submit" value="insert" />
+    </form>    
+<hr/>
+${table}
+</body>
+</html>

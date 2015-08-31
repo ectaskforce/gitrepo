@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +50,61 @@ public final class VelocityMain implements SparkApplication {
             return new ModelAndView(model, "hello.wm");
         }, new VelocityTemplateEngine());
         
+        get("/zandaka", (request, response) -> {
+            HtmlTableHelper hth = getHtmlTable("SELECT z.*, ( z.mufj + z.gen + z.edy + z.jibun + z.floating ) total FROM tb_zandaka z INNER JOIN (SELECT MAX(id) maxid FROM tb_zandaka ) m ON z.id = m.maxid ");
+            String htmlTable =  hth.makeTableInner();
+            Map<String, Object> model = new HashMap<>();
+            LocalDate locald = LocalDate.now();
+            model.put("table", htmlTable);
+            model.put("datadate", locald);
+
+            // The wm files are located under the resources directory
+            return new ModelAndView(model, "zandaka.wm");
+        }, new VelocityTemplateEngine());
+
+        post("/zandaka", (request, response) -> {
+            String ret = "";
+            try {
+            Connection con = Connector.connect(new JDBC());
+            String psql = " select count(datadate) dt from tb_zandaka where datadate = ?";
+            PreparedStatement ps = con.prepareStatement(psql);
+            ps.setString(1, request.queryParams("datadate"));
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            if ( rs.getInt("dt") > 0 ) {
+                rs.close();
+                ps.close();
+                psql = " insert into tb_zandaka ( datadate, mufj, jibun, edy, gen, float) values ( ?, ?, ?, ?, ?, ? )";
+                ps = con.prepareStatement(psql);
+                ps.setString(1, request.queryParams("datadate"));
+                ps.setString(2, request.queryParams("mufj"));
+                ps.setString(3, request.queryParams("jibun"));
+                ps.setString(4, request.queryParams("edy"));
+                ps.setString(5, request.queryParams("gen"));
+                ps.setString(6, request.queryParams("float"));
+
+            } else {
+                
+                rs.close();
+                ps.close();
+                psql = " update tb_zandaka set mufj = ?, jibun = ?, edy =? ,gen = ? , float = ? where datadate = ? ";
+                ps = con.prepareStatement(psql);
+                ps.setString(1, request.queryParams("mufj"));
+                ps.setString(2, request.queryParams("jibun"));
+                ps.setString(3, request.queryParams("edy"));
+                ps.setString(4, request.queryParams("gen"));
+                ps.setString(5, request.queryParams("float"));
+                ps.setString(6, request.queryParams("datadate"));
+            }
+            
+            ps.execute();
+            response.redirect("./zandaka"); 
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+            return ret;
+            });
+
         post("/hello", (request, response) -> {
             String ret = "";
             try {
