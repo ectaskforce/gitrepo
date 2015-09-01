@@ -21,16 +21,20 @@
 </head>
 <body>
     <h2> Zandaka list </h2>
+    <a href="./hello">Shiharai</a><br/>
     <form method="post" action="./zandaka">
         data date : <input type="text" name="datadate" value="${datadate}" size="10" />&nbsp;
-        mufj : <input type="text" name="mufj" value="" size="10" />&nbsp;
-        jibun : <input type="text" name="jibun" value="" size="10" />&nbsp;
-        edy : <input type="text" name="edy" value="" size="10" />&nbsp;
-        gen : <input type="text" name="gen" value="" size="10" />&nbsp;
-        float : <input type="text" name="float" value="" size="10" />&nbsp;
+        mufj : <input type="text" name="mufj" value="${mufj}" size="10" />&nbsp;
+        jibun : <input type="text" name="jibun" value="${jibun}" size="10" />&nbsp;
+        edy : <input type="text" name="edy" value="${edy}" size="10" />&nbsp;
+        gen : <input type="text" name="gen" value="${gen}" size="10" />&nbsp;
+        float : <input type="text" name="floating" value="${floating}" size="10" />&nbsp;
         <input type="submit" value="insert" />
     </form>    
 <hr/>
 ${table}
+<div style="color:red">
+${error}
+</div>
 </body>
 </html>

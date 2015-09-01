@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import spark.ModelAndView;
+import spark.Request;
+import spark.Response;
+import spark.Session;
 import spark.template.velocity.VelocityTemplateEngine;
 
 import static spark.Spark.get;
@@ -40,23 +43,51 @@ public final class VelocityMain implements SparkApplication {
     public void init() {
 
         get("/hello", (request, response) -> {
-            HtmlTableHelper hth = getHtmlTable("select * from siharai order by id desc");
+            HtmlTableHelper hth = getHtmlTable("select * from siharai order by id desc", false);
             String htmlTable = getSiharaiSum() + "<br/>" + hth.makeTableInner();
             Map<String, Object> model = new HashMap<>();
             model.put("table", htmlTable);
             model.put("result", hth.core.size());
+            Session s = request.session();
+            if ( s != null ) {
+                model.put("error", s.attribute("error"));
+            } else {
+                model.put("error", " ");
+            }
 
             // The wm files are located under the resources directory
             return new ModelAndView(model, "hello.wm");
         }, new VelocityTemplateEngine());
         
         get("/zandaka", (request, response) -> {
-            HtmlTableHelper hth = getHtmlTable("SELECT z.*, ( z.mufj + z.gen + z.edy + z.jibun + z.floating ) total FROM tb_zandaka z order by id desc");
+            HtmlTableHelper hth = getHtmlTable("SELECT z.*, ( z.mufj + z.gen + z.edy + z.jibun + z.floating ) total FROM tb_zandaka z order by id desc", true);
             String htmlTable =  hth.makeTableInner();
+            Map<String,String> firstRec = hth.getFirstRec();
+                if ( firstRec == null ) {
+                firstRec = new HashMap<>();
+                firstRec.put("mufj","");
+                firstRec.put("gen","");
+                firstRec.put("edy","");
+                firstRec.put("jibun","");
+                firstRec.put("floating","");
+            }
+
             Map<String, Object> model = new HashMap<>();
             LocalDate locald = LocalDate.now();
             model.put("table", htmlTable);
             model.put("datadate", locald);
+            model.put("mufj", firstRec.get("mufj"));
+            model.put("gen", firstRec.get("gen"));
+            model.put("edy", firstRec.get("edy"));
+            model.put("jibun", firstRec.get("jibun"));
+            model.put("floating", firstRec.get("floating"));
+
+            Session s = request.session();
+            if ( s != null && s.attribute("error") != null ) {
+                model.put("error", s.attribute("error") + " ");
+            } else {
+                model.put("error", " ");
+            }
 
             // The wm files are located under the resources directory
             return new ModelAndView(model, "zandaka.wm");
@@ -69,38 +100,39 @@ public final class VelocityMain implements SparkApplication {
             String psql = " select count(datadate) dt from tb_zandaka where datadate = ?";
             PreparedStatement ps = con.prepareStatement(psql);
             ps.setString(1, request.queryParams("datadate"));
+
             ResultSet rs = ps.executeQuery();
             rs.next();
-            if ( rs.getInt("dt") > 0 ) {
+            if ( rs.getInt("dt") == 0 ) {
                 rs.close();
                 ps.close();
-                psql = " insert into tb_zandaka ( datadate, mufj, jibun, edy, gen, float) values ( ?, ?, ?, ?, ?, ? )";
+                psql = " insert into tb_zandaka ( datadate, mufj, jibun, edy, gen, floating) values ( ?, ?, ?, ?, ?, ? )";
                 ps = con.prepareStatement(psql);
                 ps.setString(1, request.queryParams("datadate"));
                 ps.setString(2, request.queryParams("mufj"));
                 ps.setString(3, request.queryParams("jibun"));
                 ps.setString(4, request.queryParams("edy"));
                 ps.setString(5, request.queryParams("gen"));
-                ps.setString(6, request.queryParams("float"));
+                ps.setString(6, request.queryParams("floating"));
 
             } else {
                 
                 rs.close();
                 ps.close();
-                psql = " update tb_zandaka set mufj = ?, jibun = ?, edy =? ,gen = ? , float = ? where datadate = ? ";
+                psql = " update tb_zandaka set mufj = ?, jibun = ?, edy =? ,gen = ? , floating = ? where datadate = ? ";
                 ps = con.prepareStatement(psql);
                 ps.setString(1, request.queryParams("mufj"));
                 ps.setString(2, request.queryParams("jibun"));
                 ps.setString(3, request.queryParams("edy"));
                 ps.setString(4, request.queryParams("gen"));
-                ps.setString(5, request.queryParams("float"));
+                ps.setString(5, request.queryParams("floating"));
                 ps.setString(6, request.queryParams("datadate"));
             }
             
             ps.execute();
             response.redirect("./zandaka"); 
             } catch(Exception e) {
-                throw new RuntimeException(e);
+                doErrorForward(e, request, response, "./zandaka");
             }
             return ret;
             });
@@ -120,32 +152,65 @@ public final class VelocityMain implements SparkApplication {
             ps.execute();
             response.redirect("./hello"); 
             } catch(Exception e) {
-                throw new RuntimeException(e);
+                doErrorForward(e, request, response, "./hello");
             }
             return ret;
             });
         
     }
 
-    public String getSiharaiSum() {
-        return getHtmlTable("select * from v_total order by shiharaidate desc").makeTableInner();
+    public static void doErrorForward(Exception e, 
+                                        Request request,
+                                        Response response,
+                                        String path) {
+        String error = getExceptionString(e);
+        Session s = request.session(true);
+        s.attribute("error", error);
+        response.redirect(path);
+       
     }
     
-    public HtmlTableHelper getHtmlTable(String sql) {
+    public static String getExceptionString(Exception e) {
+    
+        String result = e.getLocalizedMessage() + "<br/>";
+        StackTraceElement [] ste  = e.getStackTrace();
+        for (StackTraceElement st : ste) {
+            result += st.toString() + "<br/>";
+        }
+        return result;
+    }
+    
+    public String getSiharaiSum() {
+        return getHtmlTable("select * from v_total order by shiharaidate desc", false).makeTableInner();
+    }
+    
+    public HtmlTableHelper getHtmlTable(String sql, boolean zandaka) {
         String table = "";
         HtmlTableHelper hth = new HtmlTableHelper();
         try {
             Connection con = Connector.connect(new JDBC());
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
+            boolean atFirst = true;
             while(rs.next()) {
+                if ( atFirst && zandaka) {
+                    Map<String, String> firstRec = new HashMap<>();
+                    firstRec.put("mufj", rs.getString("mufj"));
+                    firstRec.put("jibun", rs.getString("jibun"));
+                    firstRec.put("edy", rs.getString("edy"));
+                    firstRec.put("gen", rs.getString("gen"));
+                    firstRec.put("floating", rs.getString("floating"));
+                    hth.setFirstRec(firstRec);
+                    atFirst = false;
+                    
+                }
                 hth.putRec(rs);
             }
             rs.close();
             st.close();
             con.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         
         return hth;

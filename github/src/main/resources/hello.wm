@@ -10,6 +10,7 @@
 </head>
 <body>
     <h2> quick pay list </h2>
+    <a href="./zandaka">Zandaka</a><br/>
     <form method="post" action="./hello">
         data date : <input type="text" name="datadate" value="" size="10" />&nbsp;
         price : <input type="text" name="price" value="" size="10" />&nbsp;
@@ -21,5 +22,8 @@
 <hr/>
 ${table}
 ${result}
+<div style="color:red">
+${error}
+</div>
 </body>
 </html>

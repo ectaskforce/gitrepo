@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * リストで持っているレコードセットの結果をHTMLテーブルに変換する.<br/>
@@ -25,6 +26,16 @@ import java.util.List;
 public class HtmlTableHelper {
 
     public final List<List<String>> core = new ArrayList<>();
+    
+    private Map<String, String> firstRec;
+
+    public Map<String, String> getFirstRec() {
+        return firstRec;
+    }
+
+    public void setFirstRec(Map<String, String> firstRec) {
+        this.firstRec = firstRec;
+    }
 
     static boolean rowEven = false;
 
