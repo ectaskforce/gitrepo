@@ -41,15 +41,32 @@ public class AppBase {
         return result;
     }
     
-    public String getSiharaiSum() {
+    public static String getSiharaiSum() {
         return getHtmlTable("select * from v_total order by shiharaidate desc", false).makeTableInner();
     }
     
-    public HtmlTableHelper getHtmlTable(String sql, boolean zandaka) {
+    /**
+     * mysql JDBCでrecordset を HtmlTable に変換する.
+     * @param sql SQL文
+     * @param zandaka 残高か
+     * @return HtmlTable
+     */
+    public static HtmlTableHelper getHtmlTable(String sql, boolean zandaka) {
+        return getHtmlTable(new JDBC(), sql, zandaka);
+    }
+
+    /**
+     * JDBCありでrecordset を HtmlTable に変換する.
+     * @param jdbc SQL文
+     * @param sql SQL文
+     * @param zandaka 残高か
+     * @return HtmlTable
+     */
+    public static HtmlTableHelper getHtmlTable(JDBC jdbc, String sql, boolean zandaka) {
         String table = "";
         HtmlTableHelper hth = new HtmlTableHelper();
         try {
-            Connection con = Connector.connect(new JDBC());
+            Connection con = Connector.connect(jdbc);
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
             String nows = LocalDate.now().toString();

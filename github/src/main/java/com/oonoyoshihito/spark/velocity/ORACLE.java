@@ -15,7 +15,7 @@ public class ORACLE extends JDBC implements Serializable {
     
     private String jdbcDrvier = "oracle.jdbc.driver.OracleDriver" ;
     
-    private String url = "jdbc:thin://oonoyoshihito.com:1521/HR";
+    private String url = "jdbc:oracle:thin:@oonoyoshihito.com:1521:XE";
     
     private String user = "OONO";
     
