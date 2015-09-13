@@ -38,6 +38,7 @@ public final class VelocityMain extends AppBase implements SparkApplication {
     public void init() {
         
         get("/oracle", (request, response) -> { 
+            
             return new OracleHR().process(request, response);
         }, new VelocityTemplateEngine());
 

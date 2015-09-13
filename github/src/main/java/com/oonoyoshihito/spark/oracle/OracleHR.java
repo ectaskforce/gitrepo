@@ -20,7 +20,12 @@ import spark.Response;
  * /oracle を処理する.
  * @author duke_2
  */
-public class OracleHR {
+public class OracleHR extends Oracle {
+    
+    public OracleHR () {
+        this.setSchema("HR");
+    }
+    
     public ModelAndView process(Request request, Response reponse) {
         Map<String, Object> model = new HashMap<>();
         model.put("table", "");
@@ -28,7 +33,7 @@ public class OracleHR {
 
         ORACLE ora = new ORACLE();
         try {
-            String sql = "select * from SYS.ALL_TAB_COLUMNS where OWNER = 'HR' order by OWNER, TABLE_NAME, COLUMN_ID";
+            String sql = "select * from SYS.ALL_TAB_COLUMNS where OWNER = '" + schema + "' order by OWNER, TABLE_NAME, COLUMN_ID";
             HtmlTableHelper hth = AppBase.getHtmlTable(new ORACLE(), sql, false);
             String htmlTable = hth.makeTableInner();
                 model.put("table" ,htmlTable);
@@ -38,5 +43,6 @@ public class OracleHR {
         
         return new ModelAndView( model, "hello.wm");
     }
+
 }
  
