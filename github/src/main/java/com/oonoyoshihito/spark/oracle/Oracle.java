@@ -5,11 +5,15 @@
  */
 package com.oonoyoshihito.spark.oracle;
 
+import spark.ModelAndView;
+import spark.Request;
+import spark.Response;
+
 /**
  *
  * @author duke_2
  */
-public class Oracle {
+abstract public class Oracle {
  
     String schema ;
     
@@ -20,4 +24,6 @@ public class Oracle {
     public void setSchema(String schema) {
         this.schema = schema;
     }
+    
+    abstract public ModelAndView process(Request request, Response reponse);
 }
