@@ -191,18 +191,20 @@ public final class VelocityMain implements SparkApplication {
             Connection con = Connector.connect(new JDBC());
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
+            String nows = LocalDate.now().toString();
             boolean atFirst = true;
             while(rs.next()) {
                 if ( atFirst && zandaka) {
-                    Map<String, String> firstRec = new HashMap<>();
-                    firstRec.put("mufj", rs.getString("mufj"));
-                    firstRec.put("jibun", rs.getString("jibun"));
-                    firstRec.put("edy", rs.getString("edy"));
-                    firstRec.put("gen", rs.getString("gen"));
-                    firstRec.put("floating", rs.getString("floating"));
-                    hth.setFirstRec(firstRec);
-                    atFirst = false;
-                    
+                    if ( nows.compareTo(rs.getString("datadate")) >= 0 ) {
+                        Map<String, String> firstRec = new HashMap<>();
+                        firstRec.put("mufj", rs.getString("mufj"));
+                        firstRec.put("jibun", rs.getString("jibun"));
+                        firstRec.put("edy", rs.getString("edy"));
+                        firstRec.put("gen", rs.getString("gen"));
+                        firstRec.put("floating", rs.getString("floating"));
+                        hth.setFirstRec(firstRec);
+                        atFirst = false;
+                    }
                 }
                 hth.putRec(rs);
             }
