@@ -7,14 +7,34 @@
     font-size : 9pt;
  }
  </style>
+ <script src="./js/jquery-1.11.3.js" type="text/javascript"></script>
+ <script src="./js/knockout-debug.js" type="text/javascript"></script>
+ <script type="text/javascript">
+    $(function(){
+        $("#datadate").on("change", function () {
+           var simeDate = $("#datadate").val();
+           console.log(simeDate);
+           var simeSplit = simeDate.split("-");
+           console.log(simeSplit);
+           if ( simeSplit.length === 3 ) {
+               var sDate = new Date(simeSplit[0], simeSplit[1], simeSplit[2]);
+               console.log(sDate);
+               if ( sDate.getDate() > 0 ) {
+                   alert("sime 更新できます");
+               }
+           }
+        }
+        );
+     });
+ </script>
 </head>
 <body>
     <h2> quick pay list </h2>
     <a href="./zandaka">Zandaka</a><br/>
     <form method="post" action="./hello">
-        data date : <input type="text" name="datadate" value="" size="10" />&nbsp;
+        data date : <input type="text" id="datadate" name="datadate" value="" size="10" />&nbsp;
         price : <input type="text" name="price" value="" size="10" />&nbsp;
-        sime : <input type="text" name="sime" value="" size="10" />&nbsp;
+        sime : <input type="text" id="sime" data-bind="text: sime" name="sime" value="" size="10" />&nbsp;
         type : <input type="text" name="type" value="" size="1" />&nbsp;
         desc : <input type="text" name="desc" value="" size="100" />&nbsp;
         <input type="submit" value="insert" />
