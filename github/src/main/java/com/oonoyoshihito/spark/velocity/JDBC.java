@@ -15,8 +15,8 @@ public class JDBC implements Serializable {
     
     private String jdbcDrvier = "com.mysql.jdbc.Driver" ;
     
-//    private String url = "jdbc:mysql://localhost:3306/keiri";
-    private String url = "jdbc:mysql://oonoyoshihito.com:3306/keiri";
+    private String url = "jdbc:mysql://localhost:3306/keiri";
+//    private String url = "jdbc:mysql://oonoyoshihito.com:3306/keiri";
     
     private String user = "root";
     
