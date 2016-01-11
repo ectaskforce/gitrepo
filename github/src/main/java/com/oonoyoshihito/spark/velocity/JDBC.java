@@ -6,6 +6,13 @@
 package com.oonoyoshihito.spark.velocity;
 
 import java.io.Serializable;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,8 +22,7 @@ public class JDBC implements Serializable {
     
     private String jdbcDrvier = "com.mysql.jdbc.Driver" ;
     
-    private String url = "jdbc:mysql://localhost:3306/keiri";
-//    private String url = "jdbc:mysql://oonoyoshihito.com:3306/keiri";
+    private String url = "";
     
     private String user = "root";
     
@@ -35,6 +41,26 @@ public class JDBC implements Serializable {
     }
 
     public String getUrl() {
+        
+        url = "jdbc:mysql://localhost:3306/keiri";
+        
+        // ローカルとリモートのDB urlを自立して切り替え
+        try {
+            for(NetworkInterface n: Collections.list(NetworkInterface.getNetworkInterfaces()) ) {
+                for (InetAddress addr : Collections.list(n.getInetAddresses()))  {
+                    if( addr instanceof Inet4Address && !addr.isLoopbackAddress() ){
+                        if ( addr.getHostAddress().contains("192.168.12") ) {
+                            url = "jdbc:mysql://oonoyoshihito.com:3306/keiri";
+                            break;
+                        }
+                    }
+                }
+            }
+            
+        } catch (SocketException ex) {
+            Logger.getLogger(JDBC.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         return url;
     }
 
