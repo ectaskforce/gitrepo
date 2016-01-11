@@ -7,6 +7,9 @@ package com.oonoyoshihito.spark.velocity;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -14,7 +17,12 @@ import java.sql.DriverManager;
  */
 public class Connector {
  
+    static Logger logger = LoggerFactory.getLogger(Connector.class);
     public static Connection connect(JDBC jdbc) throws Exception {
+        
+        
+        logger.info("driver : " + jdbc.getJdbcDrvier());
+        logger.info("url : " + jdbc.getUrl() + " user : " + jdbc.getUser() + " pass : " + jdbc.getPass());
         
         Class.forName(jdbc.getJdbcDrvier());
         Connection c = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPass()) ;
