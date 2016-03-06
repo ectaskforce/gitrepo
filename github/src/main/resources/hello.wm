@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
- <title> quick pay list Ver. 20160123 </title>
+ <title> quick pay list Ver. 20160306 </title>
  <meta charset="UTF-8">
  <style>
   * {
@@ -10,15 +10,57 @@
  </style>
  <script src="./js/jquery-1.11.3.js" type="text/javascript"></script>
  <script src="./js/knockout-debug.js" type="text/javascript"></script>
- <script src="./js/hello.js" type="text/javascript" charset="UTF-8"></script>
  <script type="text/javascript" >
+     
+    function onReady() {
+
+        // 締日の自動入力
+        $("#datadate").on("change", function () {
+
+           // 起票日を取得
+           var simeDate = $("#datadate").val();
+
+           // 日付セパレータでsplit
+           var simeSplit = simeDate.split("-");
+
+           // 3個に出来たら
+           if ( simeSplit.length === 3 ) {
+               var sDate = new Date(simeSplit[0], simeSplit[1], simeSplit[2]);
+
+               // 日付として認可出来るなら
+               if ( sDate.getDate() > 0 && simeSplit[2].match(/[0-9]+/) ) {
+                   // 締日を計算する
+                   var monp = 1;
+
+                   // 9日以上なら翌々月
+                   if ( parseInt(simeSplit[2]) > 8 ) {
+                       monp = 2;
+                   }
+
+                   // 付きの0サブ
+                   simeSplit[1] = parseInt(simeSplit[1]) + monp ;
+                   if ( parseInt(simeSplit[1]) > 12 ) {
+                       simeSplit[0] ++;
+                       simeSplit[1] = parseInt(simeSplit[1]) - 12;
+                   }
+                   simeSplit[1] = "0" + simeSplit[1] ;
+                   simeSplit[1] = simeSplit[1].substring(simeSplit[1].length - 2);
+                   simeSplit[2] = '05';
+
+                   // 締日を自動で入力
+                   $("#sime").val( simeSplit[0] + "-" + simeSplit[1] + "-" + simeSplit[2] );
+               }
+           }
+        });
+    }
+     
     $(function(){
         onReady();
      });
  </script>
 </head>
 <body>
-    <h2> quick pay list Ver. 20160123 </h2>
+    <h2> quick pay list Ver. 20160306 </h2>
     <a href="./zandaka">Zandaka</a><br/>
     <form method="post" action="./hello">
         data date : <input type="text" id="datadate" name="datadate" value="" size="10" />&nbsp;

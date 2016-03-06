@@ -23,7 +23,7 @@ public class Hello extends GetRequest {
     @Override
     public ModelAndView doGet(Request request, Response response) {
         HtmlTableHelper hth = AppBase.getHtmlTable("select * from siharai order by id desc", false);
-        String htmlTable = AppBase.getSiharaiSum() + "<br/>" + hth.makeTableInner();
+        String htmlTable = AppBase.getSiharaiSum() + "<br/>" + hth.makeTableInner() + "<div>" + request.contextPath() + "</div>";
         Map<String, Object> model = new HashMap<>();
         model.put("table", htmlTable);
         model.put("result", hth.core.size());
