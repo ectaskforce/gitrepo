@@ -43,6 +43,7 @@ public class Zandaka extends GetRequest {
         model.put("edy", firstRec.get("edy"));
         model.put("jibun", firstRec.get("jibun"));
         model.put("floating", firstRec.get("floating"));
+        model.put("root", request.contextPath());
 
         Session s = request.session();
         if ( s != null && s.attribute("error") != null ) {

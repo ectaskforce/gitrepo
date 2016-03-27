@@ -8,8 +8,8 @@
     font-size : 9pt;
  }
  </style>
- <script src="./js/jquery-1.11.3.js" type="text/javascript"></script>
- <script src="./js/knockout-debug.js" type="text/javascript"></script>
+ <script src="${root}/js/jquery-1.11.3.js" type="text/javascript"></script>
+ <script src="${root}/js/knockout-debug.js" type="text/javascript"></script>
  <script type="text/javascript" >
      
     function onReady() {

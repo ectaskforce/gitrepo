@@ -27,6 +27,7 @@ public class Hello extends GetRequest {
         Map<String, Object> model = new HashMap<>();
         model.put("table", htmlTable);
         model.put("result", hth.core.size());
+        model.put("root", request.contextPath());
         Session s = request.session();
         if ( s != null ) {
             model.put("error", s.attribute("error"));
